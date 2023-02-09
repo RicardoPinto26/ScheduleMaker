@@ -26,7 +26,7 @@ object SubjectListSerializer : StringSerializer<List<Subject>> {
         var currentSubjects = listOf<Subject>()
 
         var readingTimes = false
-        input.split("\r\n").forEachIndexed { i, it ->
+        input.split("\r\n").forEach {
             if (!readingTimes) {
                 val tokens = it.split(' ')
                 currentSubjectName = tokens[0]
