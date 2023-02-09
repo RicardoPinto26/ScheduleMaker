@@ -9,9 +9,10 @@ data class Schedule(val label: String, val subjects: List<Subject>) {
         val EMPTY_SCHEDULE = Schedule("Empty", emptyList())
     }
 }
+
 private const val MAX_CLASSES = 5
 
-fun computeSchedules(subjects: List<Subject>): List<Schedule> {
+fun List<Subject>.computeSchedules(): List<Schedule> {
     var schedules = listOf<Schedule>()
     val semester = 4
     val range = (semester * 10)..(semester * 10 + MAX_CLASSES)
@@ -19,10 +20,10 @@ fun computeSchedules(subjects: List<Subject>): List<Schedule> {
         val newSchedule = Schedule(
             label = "$ls,$pc,$lae,$sisInf",
             subjects = listOf(
-                subjects.firstOrNull { it.name.contains("LAE") && it.classId == lae } ?: continue,
-                subjects.firstOrNull { it.name.contains("LS") && it.classId == ls } ?: continue,
-                subjects.firstOrNull { it.name.contains("PC") && it.classId == pc } ?: continue,
-                subjects.firstOrNull { it.name.contains("SisInf") && it.classId == sisInf } ?: continue
+                this.firstOrNull { it.name.contains("LAE") && it.classId == lae } ?: continue,
+                this.firstOrNull { it.name.contains("LS") && it.classId == ls } ?: continue,
+                this.firstOrNull { it.name.contains("PC") && it.classId == pc } ?: continue,
+                this.firstOrNull { it.name.contains("SisInf") && it.classId == sisInf } ?: continue
             )
         )
         if (

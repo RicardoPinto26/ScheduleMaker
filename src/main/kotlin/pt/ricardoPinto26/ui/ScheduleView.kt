@@ -8,7 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import pt.ricardoPinto26.model.*
+import pt.ricardoPinto26.model.Day
+import pt.ricardoPinto26.model.Schedule
+import pt.ricardoPinto26.model.Time
+import pt.ricardoPinto26.model.timesFor
 
 val SEGMENT_HEIGHT = 24.dp
 val SEGMENT_WIDTH = 128.dp
@@ -62,16 +65,4 @@ fun ScheduleView(schedule: Schedule) {
             }
         }
     }
-}
-
-fun List<Subject>.timesFor(day: Day): List<MeetingTime> {
-    var list = listOf<MeetingTime>()
-
-    this.forEach { subject ->
-        subject.meetingTimes.forEach { meetingTime ->
-            if (meetingTime.day == day) list = list + meetingTime
-        }
-    }
-
-    return list
 }

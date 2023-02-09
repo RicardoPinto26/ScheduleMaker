@@ -32,17 +32,19 @@ fun MeetingTimeView(meetingTime: MeetingTime) {
     }
 }
 
+val SUBJECT_BUTTON_HEIGHT = 34.dp
 
 @Composable
 fun SubjectListView(list: List<Subject>, onDelete: (Subject) -> Unit) {
     Column(
         modifier = Modifier.background(Color.LightGray).border(BORDER_THICKNESS, Color.Black).width(SEGMENT_WIDTH * 2)
+            .heightIn(min = SUBJECT_BUTTON_HEIGHT)
     ) {
         list.forEach {
             Button(
                 border = BorderStroke(BORDER_THICKNESS, Color.Black),
                 shape = RoundedCornerShape(100),
-                modifier = Modifier.padding(0.dp).height(34.dp).fillMaxWidth(),
+                modifier = Modifier.padding(0.dp).height(SUBJECT_BUTTON_HEIGHT).fillMaxWidth(),
                 onClick = { onDelete(it) }) {
                 Text(
                     modifier = Modifier.padding(0.dp),
