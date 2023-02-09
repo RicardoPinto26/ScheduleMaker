@@ -1,14 +1,17 @@
 package pt.ricardoPinto26.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import pt.ricardoPinto26.model.MeetingTime
 import pt.ricardoPinto26.model.Subject
 
@@ -32,10 +35,20 @@ fun MeetingTimeView(meetingTime: MeetingTime) {
 
 @Composable
 fun SubjectListView(list: List<Subject>, onDelete: (Subject) -> Unit) {
-    Column(Modifier.background(Color.LightGray).border(BORDER_THICKNESS, Color.Black)) {
+    Column(
+        modifier = Modifier.background(Color.LightGray).border(BORDER_THICKNESS, Color.Black).width(SEGMENT_WIDTH * 2)
+    ) {
         list.forEach {
-            Button(modifier = Modifier.padding(0.dp), onClick = { onDelete(it) }) {
-                Text("${it.name} ${it.classId}")
+            Button(
+                border = BorderStroke(BORDER_THICKNESS, Color.Black),
+                shape = RoundedCornerShape(100),
+                modifier = Modifier.padding(0.dp).height(34.dp).fillMaxWidth(),
+                onClick = { onDelete(it) }) {
+                Text(
+                    modifier = Modifier.padding(0.dp),
+                    fontSize = 12.sp,
+                    text = "${it.name} ${it.professor} ${it.classId}"
+                )
             }
 
         }

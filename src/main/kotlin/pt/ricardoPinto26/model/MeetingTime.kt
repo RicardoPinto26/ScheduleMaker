@@ -83,9 +83,7 @@ enum class Day {
     TUESDAY,
     WEDNESDAY,
     THURSDAY,
-    FRIDAY,
-    SATURDAY,
-    SUNDAY;
+    FRIDAY;
 
     companion object {
         operator fun invoke(index: Int): Day {
@@ -93,7 +91,8 @@ enum class Day {
             return values()[index]
         }
 
-        fun parse(name: String): Day = Day.values().first { it.name == name }
+        fun parse(name: String): Day =
+            Day.values().firstOrNull { it.name == name } ?: throw IllegalArgumentException("No such day exists")
     }
 }
 
@@ -125,7 +124,7 @@ data class MeetingTime(
         this.day != other.day || !(other.startTime >= this.startTime && other.startTime < this.endTime)
 }
 
-class Subject(val name: String, val classId: Int, val meetingTimes: List<MeetingTime>) {
+class Subject(val name: String, val professor: String?, val classId: Int, val meetingTimes: List<MeetingTime>) {
     fun isCompatible(other: Subject) =
         this.meetingTimes.all { thisMeetingTime ->
             other.meetingTimes.all { otherMeetingTime ->

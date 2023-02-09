@@ -9,10 +9,13 @@ data class Schedule(val label: String, val subjects: List<Subject>) {
         val EMPTY_SCHEDULE = Schedule("Empty", emptyList())
     }
 }
+private const val MAX_CLASSES = 5
 
 fun computeSchedules(subjects: List<Subject>): List<Schedule> {
     var schedules = listOf<Schedule>()
-    for (ls in 40..42) for (pc in 40..43) for (lae in 40..43) for (sisInf in 40..42) {
+    val semester = 4
+    val range = (semester * 10)..(semester * 10 + MAX_CLASSES)
+    for (ls in range) for (pc in range) for (lae in range) for (sisInf in range) {
         val newSchedule = Schedule(
             label = "$ls,$pc,$lae,$sisInf",
             subjects = listOf(

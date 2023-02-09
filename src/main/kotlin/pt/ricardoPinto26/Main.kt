@@ -19,7 +19,6 @@ import java.io.File
 import java.io.FileNotFoundException
 
 fun main() {
-
     var currentSubjectName = ""
     var currentClass = 0
     var currentProfessor: String? = null
@@ -41,7 +40,7 @@ fun main() {
                 val times = it.split(';')
                 times.forEach { time ->
                     val tokens = time.split('-')
-                    val day = Day.parse(tokens[0])
+                    val day = Day.parse(tokens[0].uppercase())
                     val startTime = tokens[1].toTime()
                     val endTime = tokens[2].toTime()
                     val room = if (tokens.size == 4) tokens[3] else null
@@ -56,7 +55,7 @@ fun main() {
                     )
                 }
                 currentSubjects =
-                    currentSubjects + Subject(currentSubjectName, currentClass, meetingTimes)
+                    currentSubjects + Subject(currentSubjectName, currentProfessor, currentClass, meetingTimes)
                 meetingTimes = listOf()
                 readingTimes = false
             }
@@ -69,14 +68,20 @@ fun main() {
 
     application {
         val winState =
-            WindowState(size = DpSize(SEGMENT_WIDTH * (8 + 4), SEGMENT_HEIGHT * 31 + BORDER_THICKNESS * 31 + 8.dp))
+            WindowState(
+                size = DpSize(
+                    SEGMENT_WIDTH * (Day.values().size + 1 + 4),
+                    SEGMENT_HEIGHT * 31 + BORDER_THICKNESS * 31 + 8.dp
+                )
+            )
         var schedules by remember { mutableStateOf(currentSchedules) }
         var subjects by remember { mutableStateOf(currentSubjects) }
         var currentIndex = 0
         var currentSchedule by remember { mutableStateOf(schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE) }
         Window(
+            title = "Schedule Maker",
             onCloseRequest = {
-                if(true) exitApplication()
+                if (true) exitApplication()
             },
             state = winState, resizable = false
         ) {
@@ -100,112 +105,35 @@ fun main() {
                         }, enabled = schedules.size !in 0..1) {
                             Text("Next Schedule")
                         }
-                        Button({
-                            schedules = schedules - currentSchedule
-                            currentIndex =
-                                if (currentIndex == 0) schedules.size - 1
-                                else currentIndex - 1
-                            currentSchedule = schedules[currentIndex]
-                        }, enabled = schedules.size !in 0..1) {
+                        Button(
+                            {
+                                schedules = schedules - currentSchedule
+                                currentIndex =
+                                    if (currentIndex == schedules.size) 0
+                                    else currentIndex
+                                if (schedules.isEmpty()) schedules = schedules + Schedule.EMPTY_SCHEDULE
+                                currentSchedule = schedules[currentIndex]
+                            },
+                            enabled = !(schedules.all { it == Schedule.EMPTY_SCHEDULE })
+                        ) {
                             Text("Delete Schedule")
                         }
                     }
-                    SubjectListView(subjects) {
-                        subjects = subjects - it
-                        schedules = computeSchedules(subjects)
-                        currentIndex = 0
-                        currentSchedule = schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE
+                    Row {
+                        SubjectListView(subjects) {
+                            subjects = subjects - it
+                            schedules = computeSchedules(subjects)
+                            currentIndex = 0
+                            currentSchedule = schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE
+                        }
+                        Button({
+                            TODO()
+                        }) {
+                            Text("Add Subject")
+                        }
                     }
                 }
             }
         }
     }
 }
-
-/*
-fun mainInput() {
-
-    var input: String
-    var newSubject = true
-    var newClass = true
-    var currentSubjects = listOf<Subject>()
-    var currentMeetingTimes = listOf<MeetingTime>()
-    var subjectLabel = ""
-    var classLabel = ""
-    var skipSubject = false
-    while (true) {
-        if (newSubject) {
-            print("Subject Label?\n> ")
-            subjectLabel = readln()
-            if (subjectLabel == "skip") skipSubject = true
-            newSubject = false
-            newClass = true
-        }
-        if(newClass) {
-            print("Class Label? (40 for 41N, 41D/42D/43D)\n> ")
-            classLabel = readln()
-            newClass = false
-        }
-        if (!skipSubject) Day.values().forEach { day ->
-            print("meeting time for $day? (Format Example: 8.00-9.30\n> ")
-            input = readln()
-            when (input) {
-                "" -> {
-                }
-
-                else -> {
-                    val tokens = input.split('-')
-                    val startTime = tokens[0].toTime()
-                    val endTime = tokens[1].toTime()
-                    currentMeetingTimes = currentMeetingTimes + MeetingTime(day, startTime, endTime, subjectLabel)
-                }
-            }
-        }
-        print("Wanna input another subject or finish? (input/finish)\n >")
-        input = readln()
-        when (input) {
-            "input" -> {
-                currentSubjects = currentSubjects + Subject(subjectLabel, classLabel.toInt(), currentMeetingTimes)
-                currentMeetingTimes = listOf()
-                newSubject = true
-            }
-
-            "finish" -> {
-                currentSubjects = currentSubjects + Subject(subjectLabel, classLabel.toInt(), currentMeetingTimes)
-                break
-            }
-        }
-    }
-
-    val currentSchedules: List<Schedule> = computeSchedules(currentSubjects)
-
-    application {
-        val winState =
-            WindowState(size = DpSize(SEGMENT_WIDTH * (8 + 4), SEGMENT_HEIGHT * 31 + BORDER_THICKNESS * 31 + 8.dp))
-        var schedules by remember { mutableStateOf(currentSchedules + Schedule.EMPTY_SCHEDULE) }
-        var currentIndex = 0
-        var currentSchedule by remember { mutableStateOf(schedules.first()) }
-        Window(::exitApplication, state = winState, resizable = false) {
-            Row {
-                ScheduleView(currentSchedule)
-                Button({
-                    currentIndex =
-                        if (currentIndex == 0) schedules.size - 1
-                        else currentIndex - 1
-                    currentSchedule = schedules[currentIndex]
-                }) {
-                    Text("Prev Schedule")
-                }
-                Button({
-                    currentIndex =
-                        if (currentIndex == schedules.size - 1) 0
-                        else currentIndex + 1
-                    currentSchedule = schedules[currentIndex]
-                }) {
-                    Text("Next Schedule")
-                }
-            }
-        }
-    }
-}
-*/
