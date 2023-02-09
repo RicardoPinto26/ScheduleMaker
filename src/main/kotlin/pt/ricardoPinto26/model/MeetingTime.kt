@@ -27,4 +27,3 @@ data class MeetingTime(
     fun isCompatible(other: MeetingTime) =
         this.day != other.day || !(other.startTime >= this.startTime && other.startTime < this.endTime)
 }
-

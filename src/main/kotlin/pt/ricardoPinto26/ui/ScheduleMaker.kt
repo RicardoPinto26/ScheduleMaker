@@ -6,62 +6,69 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.window.FrameWindowScope
 import pt.ricardoPinto26.model.Schedule
 import pt.ricardoPinto26.model.Subject
-import pt.ricardoPinto26.model.computeSchedules
 
 @Composable
-fun ScheduleMaker(loadedSchedules: List<Schedule>, loadedSubjects: List<Subject>) {
+fun FrameWindowScope.ScheduleMaker(loadedSchedules: List<Schedule>, loadedSubjects: List<Subject>) {
     val viewModel = remember { ViewModel(loadedSchedules, loadedSubjects) }
+
+    ScheduleMenu(
+        viewModel.autoCompute,
+        onAddSubject = {
+            viewModel.openNewSubjectDialog = true
+        },
+        onLoadSchedule = {
+
+        },
+        onAutoComputeChange = { viewModel.changeAutoCompute(it) },
+    )
 
     Row {
         ScheduleView(viewModel.currentSchedule)
         Button({
-            viewModel.currentIndex =
-                if (viewModel.currentIndex == 0) viewModel.schedules.size - 1
-                else viewModel.currentIndex - 1
-            viewModel.currentSchedule = viewModel.schedules[viewModel.currentIndex]
+            viewModel.prevSchedule()
         }, enabled = viewModel.schedules.size !in 0..1) {
             Text("Prev Schedule")
         }
         Column {
             Row {
                 Button({
-                    viewModel.currentIndex =
-                        if (viewModel.currentIndex == viewModel.schedules.size - 1) 0
-                        else viewModel.currentIndex + 1
-                    viewModel.currentSchedule = viewModel.schedules[viewModel.currentIndex]
+                    viewModel.nextSchedule()
                 }, enabled = viewModel.schedules.size !in 0..1) {
                     Text("Next Schedule")
                 }
                 Button(
                     {
-                        viewModel.schedules = viewModel.schedules - viewModel.currentSchedule
-                        viewModel.currentIndex =
-                            if (viewModel.currentIndex == viewModel.schedules.size) 0
-                            else viewModel.currentIndex
-                        if (viewModel.schedules.isEmpty()) viewModel.schedules =
-                            viewModel.schedules + Schedule.EMPTY_SCHEDULE
-                        viewModel.currentSchedule = viewModel.schedules[viewModel.currentIndex]
+                        viewModel.deleteCurrentSchedule()
                     },
                     enabled = !(viewModel.schedules.all { it == Schedule.EMPTY_SCHEDULE })
                 ) {
                     Text("Delete Schedule")
                 }
             }
-            Row {
-                SubjectListView(viewModel.subjects) {
-                    viewModel.subjects = viewModel.subjects - it
-                    viewModel.schedules = viewModel.subjects.computeSchedules()
-                    viewModel.currentIndex = 0
-                    viewModel.currentSchedule = viewModel.schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE
-                }
-                Button({
-                    TODO()
-                }) {
-                    Text("Add Subject")
-                }
+            Button(
+                {
+                    viewModel.computeSchedules()
+                },
+                enabled = viewModel.subjects.isNotEmpty()
+            ) {
+                Text("Compute Schedules")
+            }
+            SubjectListView(viewModel.subjects) {
+                viewModel.deleteSubject(it)
             }
         }
+    }
+
+    if (viewModel.openNewSubjectDialog) {
+        GetNewSubject(
+            onInfoEntered = { subject ->
+                viewModel.addSubject(subject)
+                viewModel.openNewSubjectDialog = false
+            },
+            onCancel = { viewModel.openNewSubjectDialog = false }
+        )
     }
 }
