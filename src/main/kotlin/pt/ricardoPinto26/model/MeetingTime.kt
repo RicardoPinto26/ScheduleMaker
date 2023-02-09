@@ -97,7 +97,15 @@ enum class Day {
     }
 }
 
-data class MeetingTime(val day: Day, val startTime: Time, val endTime: Time, val label: String) {
+data class MeetingTime(
+    val day: Day,
+    val startTime: Time,
+    val endTime: Time,
+    val subjectName: String,
+    val professor: String?,
+    val classId: Int,
+    val room: String?
+) {
     init {
         require(startTime < endTime) { "Starting time should be before ending time" }
         require(
@@ -108,7 +116,7 @@ data class MeetingTime(val day: Day, val startTime: Time, val endTime: Time, val
         require(endTime.hour in 8..23 && (endTime.minute == 0 || endTime.minute == 30)) {
             "Class has to end from 8h30 to 23h00"
         }
-        require(label.isNotEmpty()) { "Label cannot be empty" }
+        require(subjectName.isNotEmpty()) { "subjectName cannot be empty" }
     }
 
     val duration = endTime - startTime

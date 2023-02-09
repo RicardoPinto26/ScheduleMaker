@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import pt.ricardoPinto26.model.*
 
 val SEGMENT_HEIGHT = 24.dp
-val SEGMENT_WIDTH = 100.dp
+val SEGMENT_WIDTH = 128.dp
 val BORDER_THICKNESS = 1.dp
 const val SEGMENT_DURATION = 30
 

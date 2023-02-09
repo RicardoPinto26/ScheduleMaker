@@ -1,5 +1,6 @@
 package pt.ricardoPinto26
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -13,41 +14,55 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import pt.ricardoPinto26.model.*
-import pt.ricardoPinto26.ui.BORDER_THICKNESS
-import pt.ricardoPinto26.ui.SEGMENT_HEIGHT
-import pt.ricardoPinto26.ui.SEGMENT_WIDTH
-import pt.ricardoPinto26.ui.ScheduleView
+import pt.ricardoPinto26.ui.*
 import java.io.File
+import java.io.FileNotFoundException
 
 fun main() {
 
-    var currentLabel = ""
+    var currentSubjectName = ""
     var currentClass = 0
+    var currentProfessor: String? = null
 
     var meetingTimes = listOf<MeetingTime>()
     var currentSubjects = listOf<Subject>()
 
     var readingTimes = false
-    File("schedule.txt").readLines().forEach {
-        if (!readingTimes) {
-            val tokens = it.split(' ')
-            println(tokens)
-            currentLabel = tokens[0]
-            currentClass = tokens[1].toInt()
-            readingTimes = true
-        } else {
-            val times = it.split(';')
-            times.forEach { time ->
-                val tokens = time.split('-')
-                val day = Day.parse(tokens[0])
-                val startTime = tokens[1].toTime()
-                val endTime = tokens[2].toTime()
-                meetingTimes = meetingTimes + MeetingTime(day, startTime, endTime, currentLabel)
+    try {
+        File("schedule.txt").readLines().forEach {
+            if (!readingTimes) {
+                val tokens = it.split(' ')
+                println(tokens)
+                currentSubjectName = tokens[0]
+                currentClass = tokens[1].toInt()
+                currentProfessor = if (tokens.size == 3) tokens[2] else null
+                readingTimes = true
+            } else {
+                val times = it.split(';')
+                times.forEach { time ->
+                    val tokens = time.split('-')
+                    val day = Day.parse(tokens[0])
+                    val startTime = tokens[1].toTime()
+                    val endTime = tokens[2].toTime()
+                    val room = if (tokens.size == 4) tokens[3] else null
+                    meetingTimes = meetingTimes + MeetingTime(
+                        day,
+                        startTime,
+                        endTime,
+                        currentSubjectName,
+                        currentProfessor,
+                        currentClass,
+                        room
+                    )
+                }
+                currentSubjects =
+                    currentSubjects + Subject(currentSubjectName, currentClass, meetingTimes)
+                meetingTimes = listOf()
+                readingTimes = false
             }
-            currentSubjects = currentSubjects + Subject(currentLabel, currentClass, meetingTimes)
-            meetingTimes = listOf()
-            readingTimes = false
         }
+    } catch (_: FileNotFoundException) {
+        println("No such file found. Initializing with empty schedule.")
     }
 
     val currentSchedules: List<Schedule> = computeSchedules(currentSubjects)
@@ -56,9 +71,15 @@ fun main() {
         val winState =
             WindowState(size = DpSize(SEGMENT_WIDTH * (8 + 4), SEGMENT_HEIGHT * 31 + BORDER_THICKNESS * 31 + 8.dp))
         var schedules by remember { mutableStateOf(currentSchedules) }
+        var subjects by remember { mutableStateOf(currentSubjects) }
         var currentIndex = 0
         var currentSchedule by remember { mutableStateOf(schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE) }
-        Window(::exitApplication, state = winState, resizable = false) {
+        Window(
+            onCloseRequest = {
+                if(true) exitApplication()
+            },
+            state = winState, resizable = false
+        ) {
             Row {
                 ScheduleView(currentSchedule)
                 Button({
@@ -69,13 +90,32 @@ fun main() {
                 }, enabled = schedules.size !in 0..1) {
                     Text("Prev Schedule")
                 }
-                Button({
-                    currentIndex =
-                        if (currentIndex == schedules.size - 1) 0
-                        else currentIndex + 1
-                    currentSchedule = schedules[currentIndex]
-                }, enabled = schedules.size !in 0..1) {
-                    Text("Next Schedule")
+                Column {
+                    Row {
+                        Button({
+                            currentIndex =
+                                if (currentIndex == schedules.size - 1) 0
+                                else currentIndex + 1
+                            currentSchedule = schedules[currentIndex]
+                        }, enabled = schedules.size !in 0..1) {
+                            Text("Next Schedule")
+                        }
+                        Button({
+                            schedules = schedules - currentSchedule
+                            currentIndex =
+                                if (currentIndex == 0) schedules.size - 1
+                                else currentIndex - 1
+                            currentSchedule = schedules[currentIndex]
+                        }, enabled = schedules.size !in 0..1) {
+                            Text("Delete Schedule")
+                        }
+                    }
+                    SubjectListView(subjects) {
+                        subjects = subjects - it
+                        schedules = computeSchedules(subjects)
+                        currentIndex = 0
+                        currentSchedule = schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE
+                    }
                 }
             }
         }

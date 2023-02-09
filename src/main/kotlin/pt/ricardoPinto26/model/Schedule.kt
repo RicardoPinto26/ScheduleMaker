@@ -12,14 +12,14 @@ data class Schedule(val label: String, val subjects: List<Subject>) {
 
 fun computeSchedules(subjects: List<Subject>): List<Schedule> {
     var schedules = listOf<Schedule>()
-    for (ls in 41..42) for (pc in 41..42) for (lae in 41..42) for (sisInf in 41..42) {
+    for (ls in 40..42) for (pc in 40..43) for (lae in 40..43) for (sisInf in 40..42) {
         val newSchedule = Schedule(
             label = "$ls,$pc,$lae,$sisInf",
             subjects = listOf(
-                subjects.first { it.name == "LAE" && it.classId == lae },
-                subjects.first { it.name == "LS" && it.classId == ls },
-                subjects.first { it.name == "PC" && it.classId == pc },
-                subjects.first { it.name == "SisInf" && it.classId == sisInf }
+                subjects.firstOrNull { it.name.contains("LAE") && it.classId == lae } ?: continue,
+                subjects.firstOrNull { it.name.contains("LS") && it.classId == ls } ?: continue,
+                subjects.firstOrNull { it.name.contains("PC") && it.classId == pc } ?: continue,
+                subjects.firstOrNull { it.name.contains("SisInf") && it.classId == sisInf } ?: continue
             )
         )
         if (
