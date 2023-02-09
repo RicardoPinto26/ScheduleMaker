@@ -35,6 +35,6 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "pt.ricardoPinto26.MainKT"
+        mainClass = "pt.ricardoPinto26.MainKt"
     }
 }

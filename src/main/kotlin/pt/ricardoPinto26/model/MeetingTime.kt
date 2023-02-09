@@ -26,4 +26,12 @@ data class MeetingTime(
 
     fun isCompatible(other: MeetingTime) =
         this.day != other.day || !(other.startTime >= this.startTime && other.startTime < this.endTime)
+
+    override fun toString() = "$day-$startTime-$endTime${if (room != null) "-$room" else ""}"
+}
+
+fun List<MeetingTime>.serialize(): String {
+    var string = ""
+    this.forEach { string += "$it;" }
+    return string.dropLast(1)
 }

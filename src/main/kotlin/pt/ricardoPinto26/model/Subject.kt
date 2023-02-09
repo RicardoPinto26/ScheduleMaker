@@ -7,6 +7,9 @@ class Subject(val name: String, val professor: String?, val classId: Int, val me
                 thisMeetingTime.isCompatible(otherMeetingTime)
             }
         }
+
+    override fun toString() =
+        "$name $classId${if (professor != null) " $professor" else ""}\n${meetingTimes.serialize()}"
 }
 
 fun List<Subject>.timesFor(day: Day): List<MeetingTime> {
@@ -19,4 +22,10 @@ fun List<Subject>.timesFor(day: Day): List<MeetingTime> {
     }
 
     return list
+}
+
+fun List<Subject>.serialize(): String {
+    var string = ""
+    this.forEach { string += "$it\r\n" }
+    return string.dropLast(2)
 }

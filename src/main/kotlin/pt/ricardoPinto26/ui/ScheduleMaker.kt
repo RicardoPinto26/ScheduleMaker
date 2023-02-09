@@ -9,17 +9,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.window.FrameWindowScope
 import pt.ricardoPinto26.model.Schedule
 import pt.ricardoPinto26.model.Subject
+import pt.ricardoPinto26.storage.Storage
 
 @Composable
-fun FrameWindowScope.ScheduleMaker(loadedSchedules: List<Schedule>, loadedSubjects: List<Subject>) {
-    val viewModel = remember { ViewModel(loadedSchedules, loadedSubjects) }
+fun FrameWindowScope.ScheduleMaker(
+    storage: Storage<String, List<Subject>>,
+    loadedSchedules: List<Schedule>,
+    loadedSubjects: List<Subject>
+) {
+    val viewModel = remember { ViewModel(storage, loadedSchedules, loadedSubjects) }
 
     ScheduleMenu(
-        viewModel.autoCompute,
+        autoCompute = viewModel.autoCompute,
         onAddSubject = {
             viewModel.openNewSubjectDialog = true
         },
         onLoadSchedule = {
+
+        },
+        onSaveSubjects = {
+            viewModel.openSaveSubjectsDialog = true
+        },
+        onSaveSchedule = {
 
         },
         onAutoComputeChange = { viewModel.changeAutoCompute(it) },
@@ -69,6 +80,15 @@ fun FrameWindowScope.ScheduleMaker(loadedSchedules: List<Schedule>, loadedSubjec
                 viewModel.openNewSubjectDialog = false
             },
             onCancel = { viewModel.openNewSubjectDialog = false }
+        )
+    }
+    if (viewModel.openSaveSubjectsDialog) {
+        GetFileName(
+            onInfoEntered = { filename ->
+                viewModel.saveSubjects(filename)
+                viewModel.openSaveSubjectsDialog = false
+            },
+            onCancel = { viewModel.openSaveSubjectsDialog = false }
         )
     }
 }

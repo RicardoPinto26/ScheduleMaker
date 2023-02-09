@@ -6,6 +6,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import pt.ricardoPinto26.model.*
+import pt.ricardoPinto26.storage.FileStorage
+import pt.ricardoPinto26.storage.StringSerializer
 import pt.ricardoPinto26.ui.BORDER_THICKNESS
 import pt.ricardoPinto26.ui.SEGMENT_HEIGHT
 import pt.ricardoPinto26.ui.SEGMENT_WIDTH
@@ -13,20 +15,20 @@ import pt.ricardoPinto26.ui.ScheduleMaker
 import java.io.File
 import java.io.FileNotFoundException
 
-fun main() {
-    var currentSubjectName = ""
-    var currentClass = 0
-    var currentProfessor: String? = null
+object SubjectListSerializer : StringSerializer<List<Subject>> {
+    override fun write(obj: List<Subject>) = obj.serialize()
+    override fun parse(input: String): List<Subject> {
+        var currentSubjectName = ""
+        var currentClass = 0
+        var currentProfessor: String? = null
 
-    var meetingTimes = listOf<MeetingTime>()
-    var currentSubjects = listOf<Subject>()
+        var meetingTimes = listOf<MeetingTime>()
+        var currentSubjects = listOf<Subject>()
 
-    var readingTimes = false
-    try {
-        File("schedule.txt").readLines().forEach {
+        var readingTimes = false
+        input.split("\r\n").forEachIndexed { i, it ->
             if (!readingTimes) {
                 val tokens = it.split(' ')
-                println(tokens)
                 currentSubjectName = tokens[0]
                 currentClass = tokens[1].toInt()
                 currentProfessor = if (tokens.size == 3) tokens[2] else null
@@ -55,11 +57,22 @@ fun main() {
                 readingTimes = false
             }
         }
-    } catch (_: FileNotFoundException) {
+        return currentSubjects
+    }
+
+}
+
+fun main(args: Array<String>) {
+    var subjects: List<Subject> = emptyList()
+    val filename = if (args.isNotEmpty()) args[0] else ""
+    try {
+        subjects = SubjectListSerializer.parse(File(filename).readText())
+    } catch (e: FileNotFoundException) {
         println("No such file found. Initializing with empty schedule.")
     }
 
-    val currentSchedules: List<Schedule> = currentSubjects.computeSchedules()
+    val currentSchedules: List<Schedule> = subjects.computeSchedules()
+
 
     application {
         val winState =
@@ -76,7 +89,7 @@ fun main() {
             },
             state = winState, resizable = false
         ) {
-            ScheduleMaker(currentSchedules, currentSubjects)
+            ScheduleMaker(FileStorage(SubjectListSerializer), currentSchedules, subjects)
         }
     }
 }
