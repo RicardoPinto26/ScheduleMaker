@@ -44,7 +44,7 @@ fun List<Subject>.computeSchedules(): List<Schedule> {
             firstIteration = false
         if (wentBack) {
             var tempIndex = list.lastIndex
-            while(tempIndex != currentIndex) {
+            while (tempIndex != currentIndex) {
                 valueList[tempIndex] = range.first
                 tempIndex--
             }
