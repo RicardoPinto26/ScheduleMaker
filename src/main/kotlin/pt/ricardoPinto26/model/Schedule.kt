@@ -31,6 +31,7 @@ fun List<Subject>.computeSchedules(): List<Schedule> {
     var wentBack = false
     var firstIteration = true
 
+
     while (true) {
         if (valueList.all { it == range.last } && !firstIteration) break
         while (valueList[currentIndex] == range.last && !firstIteration) {
@@ -42,8 +43,12 @@ fun List<Subject>.computeSchedules(): List<Schedule> {
         else
             firstIteration = false
         if (wentBack) {
+            var tempIndex = list.lastIndex
+            while(tempIndex != currentIndex) {
+                valueList[tempIndex] = range.first
+                tempIndex--
+            }
             currentIndex = list.lastIndex
-            valueList[currentIndex] = range.first
             wentBack = false
         }
         run {
@@ -64,5 +69,6 @@ fun List<Subject>.computeSchedules(): List<Schedule> {
             }
         }
     }
+    println("|".repeat(24))
     return schedules
 }

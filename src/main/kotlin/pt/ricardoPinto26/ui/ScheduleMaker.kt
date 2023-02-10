@@ -25,13 +25,16 @@ fun FrameWindowScope.ScheduleMaker(
             viewModel.openNewSubjectDialog = true
         },
         onLoadSchedule = {
-
+            // TODO:
+        },
+        onLoadSubjects = {
+            // TODO:
         },
         onSaveSubjects = {
             viewModel.openSaveSubjectsDialog = true
         },
         onSaveSchedule = {
-
+            // TODO:
         },
         onAutoComputeChange = { viewModel.changeAutoCompute(it) },
     )

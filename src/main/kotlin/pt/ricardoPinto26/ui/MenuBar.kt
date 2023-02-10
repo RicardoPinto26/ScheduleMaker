@@ -9,15 +9,21 @@ fun FrameWindowScope.ScheduleMenu(
     autoCompute: Boolean,
     onAddSubject: () -> Unit,
     onLoadSchedule: () -> Unit,
+    onLoadSubjects: () -> Unit,
     onSaveSubjects: () -> Unit,
     onSaveSchedule: () -> Unit,
     onAutoComputeChange: (Boolean) -> Unit,
 ) = MenuBar {
     Menu("File") {
-        Item("Add Subject", onClick = onAddSubject)
-        Item("Load Schedule [TODO]", onClick = onLoadSchedule)
-        Item("Save Subjects [WIP]", onClick = onSaveSubjects)
-        Item("Save Schedule [TODO]", onClick = onSaveSchedule)
+        Menu("Subject") {
+            Item("Add", onClick = onAddSubject)
+            Item("Load [TODO]", onClick = onLoadSubjects)
+            Item("Save [WIP]", onClick = onSaveSubjects)
+        }
+        Menu("Schedule") {
+            Item("Load [TODO]", onClick = onLoadSchedule)
+            Item("Save [TODO]", onClick = onSaveSchedule)
+        }
     }
     Menu("Options") {
         CheckboxItem(

@@ -9,7 +9,7 @@ class Subject(val name: String, val professor: String?, val classId: Int, val me
         }
 
     override fun toString() =
-        "$name $classId${if (professor != null) " $professor" else ""}\n${meetingTimes.serialize()}"
+        "$name $classId${if (professor != null) " $professor" else ""}\r\n${meetingTimes.serialize()}"
 }
 
 fun List<Subject>.timesFor(day: Day): List<MeetingTime> {
