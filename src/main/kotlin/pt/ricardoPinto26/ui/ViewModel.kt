@@ -9,7 +9,8 @@ import pt.ricardoPinto26.model.computeSchedules
 import pt.ricardoPinto26.storage.Storage
 
 class ViewModel(
-    private val storage: Storage<String, List<Subject>>,
+    private val scheduleStorage: Storage<String, Schedule>,
+    private val subjectStorage: Storage<String, List<Subject>>,
     loadedSchedules: List<Schedule>,
     loadedSubjects: List<Subject>
 ) {
@@ -24,6 +25,9 @@ class ViewModel(
 
     var openNewSubjectDialog by mutableStateOf(false)
     var openSaveSubjectsDialog by mutableStateOf(false)
+    var openLoadSubjectsDialog by mutableStateOf(false)
+    var openSaveScheduleDialog by mutableStateOf(false)
+    var openLoadScheduleDialog by mutableStateOf(false)
 
     private var currentIndex = 0
 
@@ -51,6 +55,25 @@ class ViewModel(
         currentSchedule = schedules[currentIndex]
     }
 
+    fun loadSchedule(filename: String) {
+        val newSchedule = scheduleStorage.load(filename)
+        newSchedule.subjects.forEach { subject ->
+            if (subject !in subjects) {
+                subjects = subjects + subject
+            }
+        }
+        schedules = subjects.computeSchedules()
+        val newIndex = schedules.indexOf(newSchedule)
+        check(newIndex != -1) { "Why??????" }
+        currentIndex = newIndex
+        currentSchedule = schedules[currentIndex]
+
+    }
+
+    fun saveCurrentSchedule(filename: String) {
+        scheduleStorage.save(filename, currentSchedule)
+    }
+
     private fun deleteSchedule(schedule: Schedule) {
         schedules = schedules - schedule
         currentIndex =
@@ -73,7 +96,12 @@ class ViewModel(
         if (autoCompute) computeSchedules()
     }
 
+    fun loadSubjects(filename: String) {
+        subjects = subjectStorage.load(filename)
+        computeSchedules()
+    }
+
     fun saveSubjects(filename: String) {
-        storage.save(filename, subjects)
+        subjectStorage.save(filename, subjects)
     }
 }

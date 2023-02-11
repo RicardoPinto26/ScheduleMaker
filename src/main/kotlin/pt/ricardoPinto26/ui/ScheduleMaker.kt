@@ -6,18 +6,23 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.FrameWindowScope
+import kotlinx.coroutines.launch
 import pt.ricardoPinto26.model.Schedule
 import pt.ricardoPinto26.model.Subject
 import pt.ricardoPinto26.storage.Storage
+import java.awt.FileDialog
 
 @Composable
 fun FrameWindowScope.ScheduleMaker(
-    storage: Storage<String, List<Subject>>,
+    scheduleStorage: Storage<String, Schedule>,
+    subjectStorage: Storage<String, List<Subject>>,
     loadedSchedules: List<Schedule>,
     loadedSubjects: List<Subject>
 ) {
-    val viewModel = remember { ViewModel(storage, loadedSchedules, loadedSubjects) }
+    val viewModel = remember { ViewModel(scheduleStorage, subjectStorage, loadedSchedules, loadedSubjects) }
+    val scope = rememberCoroutineScope()
 
     ScheduleMenu(
         autoCompute = viewModel.autoCompute,
@@ -25,16 +30,16 @@ fun FrameWindowScope.ScheduleMaker(
             viewModel.openNewSubjectDialog = true
         },
         onLoadSchedule = {
-            // TODO:
+            viewModel.openLoadScheduleDialog = true
         },
         onLoadSubjects = {
-            // TODO:
+            viewModel.openLoadSubjectsDialog = true
         },
         onSaveSubjects = {
             viewModel.openSaveSubjectsDialog = true
         },
         onSaveSchedule = {
-            // TODO:
+            viewModel.openSaveScheduleDialog = true
         },
         onAutoComputeChange = { viewModel.changeAutoCompute(it) },
     )
@@ -86,12 +91,49 @@ fun FrameWindowScope.ScheduleMaker(
         )
     }
     if (viewModel.openSaveSubjectsDialog) {
-        GetFileName(
-            onInfoEntered = { filename ->
-                viewModel.saveSubjects(filename)
-                viewModel.openSaveSubjectsDialog = false
-            },
-            onCancel = { viewModel.openSaveSubjectsDialog = false }
-        )
+        viewModel.openSaveSubjectsDialog = false
+        scope.launch {
+            viewModel.saveSubjects(
+                FileDialog(window, "TITLE WIP", FileDialog.SAVE).apply {
+                    file = "*.subjects"
+                    isVisible = true
+                }.file ?: return@launch
+            )
+        }
+    }
+    if (viewModel.openLoadSubjectsDialog) {
+        viewModel.openLoadSubjectsDialog = false
+        scope.launch {
+            viewModel.loadSubjects(
+                FileDialog(window, "TITLE WIP", FileDialog.LOAD).apply {
+                    file = "*.subjects"
+                    isVisible = true
+                }.file ?: return@launch
+            )
+        }
+    }
+
+    if (viewModel.openLoadScheduleDialog) {
+        viewModel.openLoadScheduleDialog = false
+        scope.launch {
+            viewModel.loadSchedule(
+                FileDialog(window, "TITLE WIP", FileDialog.LOAD).apply {
+                    file = "*.schedule"
+                    isVisible = true
+                }.file ?: return@launch
+            )
+        }
+    }
+
+    if (viewModel.openSaveScheduleDialog) {
+        viewModel.openSaveScheduleDialog = false
+        scope.launch {
+            viewModel.saveCurrentSchedule(
+                FileDialog(window, "TITLE WIP", FileDialog.SAVE).apply {
+                    file = "*.schedule"
+                    isVisible = true
+                }.file ?: return@launch
+            )
+        }
     }
 }

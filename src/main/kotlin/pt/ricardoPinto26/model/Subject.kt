@@ -1,6 +1,6 @@
 package pt.ricardoPinto26.model
 
-class Subject(val name: String, val professor: String?, val classId: Int, val meetingTimes: List<MeetingTime>) {
+data class Subject(val name: String, val professor: String?, val classId: Int, val meetingTimes: List<MeetingTime>) {
     fun isCompatible(other: Subject) =
         this.meetingTimes.all { thisMeetingTime ->
             other.meetingTimes.all { otherMeetingTime ->

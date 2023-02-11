@@ -14,7 +14,7 @@ import androidx.compose.ui.window.DialogState
 @Composable
 fun GetFileName(onInfoEntered: (String) -> Unit, onCancel: () -> Unit) = Dialog(
     onCloseRequest = onCancel,
-    title = "Save Subjects",
+    title = "Filename",
     resizable = false,
     state = DialogState(size = DpSize.Unspecified)
 ) {

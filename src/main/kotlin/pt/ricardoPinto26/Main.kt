@@ -62,6 +62,16 @@ object SubjectListSerializer : StringSerializer<List<Subject>> {
 
 }
 
+object ScheduleSerializer : StringSerializer<Schedule> {
+    override fun write(obj: Schedule) = "${obj.label}\r\n${SubjectListSerializer.write(obj.subjects)}"
+
+    override fun parse(input: String): Schedule {
+        val tokens = input.split("\r\n", limit = 2)
+        return Schedule(tokens[0], SubjectListSerializer.parse(tokens[1]))
+    }
+
+}
+
 fun main(args: Array<String>) {
     var subjects: List<Subject> = emptyList()
     val filename = if (args.isNotEmpty()) args[0] else ""
@@ -73,13 +83,12 @@ fun main(args: Array<String>) {
 
     val currentSchedules: List<Schedule> = subjects.computeSchedules()
 
-
     application {
         val winState =
             WindowState(
                 size = DpSize(
                     SEGMENT_WIDTH * (Day.values().size + 1 + 4),
-                    SEGMENT_HEIGHT * 31 + BORDER_THICKNESS * 31 + 8.dp
+                    SEGMENT_HEIGHT * 32 + BORDER_THICKNESS * 31 + 10.dp
                 )
             )
         Window(
@@ -89,7 +98,12 @@ fun main(args: Array<String>) {
             },
             state = winState, resizable = false
         ) {
-            ScheduleMaker(FileStorage(SubjectListSerializer), currentSchedules, subjects)
+            ScheduleMaker(
+                FileStorage(ScheduleSerializer),
+                FileStorage(SubjectListSerializer),
+                currentSchedules,
+                subjects
+            )
         }
     }
 }
