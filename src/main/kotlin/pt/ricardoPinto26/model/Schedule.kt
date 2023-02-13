@@ -69,6 +69,5 @@ fun List<Subject>.computeSchedules(): List<Schedule> {
             }
         }
     }
-    println("|".repeat(24))
     return schedules
 }

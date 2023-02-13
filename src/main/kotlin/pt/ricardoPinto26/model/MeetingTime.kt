@@ -14,10 +14,10 @@ data class MeetingTime(
         require(
             startTime.hour in 8..22 && (startTime.minute == 0 || startTime.minute == 30)
         ) {
-            "Class has to begin from 8h00 to 22h30"
+            "Class has to begin from 8h00 to 22h30. Increments should be in 30min intervals. 8h00-8h30-9h00-9h30"
         }
         require(endTime.hour in 8..23 && (endTime.minute == 0 || endTime.minute == 30)) {
-            "Class has to end from 8h30 to 23h00"
+            "Class has to end from 8h30 to 23h00. Increments should be in 30min intervals. 8h00-8h30-9h00-9h30"
         }
         require(subjectName.isNotEmpty()) { "subjectName cannot be empty" }
     }

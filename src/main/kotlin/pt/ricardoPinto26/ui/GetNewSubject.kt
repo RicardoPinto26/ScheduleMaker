@@ -36,7 +36,7 @@ fun GetNewSubject(onInfoEntered: (Subject) -> Unit, onCancel: () -> Unit) = Dial
     var meetingTimes by remember { mutableStateOf(listOf<MeetingTime>()) }
 
     val maybeOnGameIdEntered = {
-        println(meetingTimes)
+        require(meetingTimes.isNotEmpty()) { "You did not insert any meeting times." }
         onInfoEntered(
             Subject(
                 subjectName,
@@ -127,6 +127,17 @@ fun GetNewSubject(onInfoEntered: (Subject) -> Unit, onCancel: () -> Unit) = Dial
         }
         Spacer(modifier = Modifier.width(16.dp))
         Button(onClick = {
+            require(subjectName.isNotEmpty() && subjectName.isNotBlank()) { "Subject's Name cannot be empty" }
+            require(professor.isNotEmpty() && professor.isNotBlank()) { "Professor's Name cannot be empty" }
+            require(classId.isNotEmpty() && classId.isNotBlank() && classId.all { it.isDigit() }) {
+                "Class must be a number and cannot be empty"
+            }
+            require(startTimeHours.isNotEmpty() && startTimeHours.isNotBlank() && startTimeHours.all { it.isDigit() }) {
+                "Starting Hour must be a number and cannot be empty"
+            }
+            require(endTimeHours.isNotEmpty() && endTimeHours.isNotBlank() && endTimeHours.all { it.isDigit() }) {
+                "Ending Hour must be a number and cannot be empty"
+            }
             meetingTimes = meetingTimes + MeetingTime(
                 day = selectedDay,
                 startTime = "$startTimeHours.${startTimeMinutes.ifEmpty { "00" }}".toTime(),

@@ -12,22 +12,22 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogState
 
 @Composable
-fun GetFileName(onInfoEntered: (String) -> Unit, onCancel: () -> Unit) = Dialog(
+fun GetStringDialog(title: String, label: String, onInfoEntered: (String) -> Unit, onCancel: () -> Unit) = Dialog(
     onCloseRequest = onCancel,
-    title = "Filename",
+    title = title,
     resizable = false,
     state = DialogState(size = DpSize.Unspecified)
 ) {
-    var filename by remember { mutableStateOf("") }
+    var input by remember { mutableStateOf("") }
     Row {
         TextField(
-            label = { Text(text = "Filename*") },
-            value = filename,
+            label = { Text(text = label) },
+            value = input,
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFEFEFEF)),
-            onValueChange = { filename = it }
+            onValueChange = { input = it }
         )
-        Button(onClick = { onInfoEntered(filename) }) {
+        Button(onClick = { onInfoEntered(input) }) {
             Text("OK")
         }
     }

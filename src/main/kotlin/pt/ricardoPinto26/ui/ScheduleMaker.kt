@@ -46,37 +46,51 @@ fun FrameWindowScope.ScheduleMaker(
 
     Row {
         ScheduleView(viewModel.currentSchedule)
-        Button({
-            viewModel.prevSchedule()
-        }, enabled = viewModel.schedules.size !in 0..1) {
-            Text("Prev Schedule")
-        }
         Column {
+            Column {
+                Row {
+                    Button({
+                        viewModel.prevSchedule()
+                    }, enabled = viewModel.schedules.size !in 0..1) {
+                        Text("Prev Schedule")
+                    }
+                    Button({
+                        viewModel.nextSchedule()
+                    }, enabled = viewModel.schedules.size !in 0..1) {
+                        Text("Next Schedule")
+                    }
+                }
+                Row {
+                    Button(
+                        {
+                            viewModel.openRenameScheduleDialog = true
+                        },
+                        enabled = viewModel.currentSchedule != Schedule.EMPTY_SCHEDULE
+                    ) {
+                        Text("Rename Schedule")
+                    }
+                    Button(
+                        {
+                            viewModel.deleteCurrentSchedule()
+                        },
+                        enabled = !(viewModel.schedules.all { it == Schedule.EMPTY_SCHEDULE })
+                    ) {
+                        Text("Delete Schedule")
+                    }
+                }
+            }
             Row {
-                Button({
-                    viewModel.nextSchedule()
-                }, enabled = viewModel.schedules.size !in 0..1) {
-                    Text("Next Schedule")
+                SubjectListView(viewModel.subjects) {
+                    viewModel.deleteSubject(it)
                 }
                 Button(
                     {
-                        viewModel.deleteCurrentSchedule()
+                        viewModel.computeSchedules()
                     },
-                    enabled = !(viewModel.schedules.all { it == Schedule.EMPTY_SCHEDULE })
+                    enabled = viewModel.subjects.isNotEmpty()
                 ) {
-                    Text("Delete Schedule")
+                    Text("Compute Schedules")
                 }
-            }
-            Button(
-                {
-                    viewModel.computeSchedules()
-                },
-                enabled = viewModel.subjects.isNotEmpty()
-            ) {
-                Text("Compute Schedules")
-            }
-            SubjectListView(viewModel.subjects) {
-                viewModel.deleteSubject(it)
             }
         }
     }
@@ -94,10 +108,12 @@ fun FrameWindowScope.ScheduleMaker(
         viewModel.openSaveSubjectsDialog = false
         scope.launch {
             viewModel.saveSubjects(
-                FileDialog(window, "TITLE WIP", FileDialog.SAVE).apply {
+                FileDialog(window, "Save Subjects", FileDialog.SAVE).apply {
                     file = "*.subjects"
                     isVisible = true
-                }.file ?: return@launch
+                }.let {
+                    (it.directory ?: return@let null) + (it.file ?: return@let null)
+                } ?: return@launch
             )
         }
     }
@@ -105,10 +121,12 @@ fun FrameWindowScope.ScheduleMaker(
         viewModel.openLoadSubjectsDialog = false
         scope.launch {
             viewModel.loadSubjects(
-                FileDialog(window, "TITLE WIP", FileDialog.LOAD).apply {
+                FileDialog(window, "Load Subjects", FileDialog.LOAD).apply {
                     file = "*.subjects"
                     isVisible = true
-                }.file ?: return@launch
+                }.let {
+                    (it.directory ?: return@let null) + (it.file ?: return@let null)
+                } ?: return@launch
             )
         }
     }
@@ -117,10 +135,12 @@ fun FrameWindowScope.ScheduleMaker(
         viewModel.openLoadScheduleDialog = false
         scope.launch {
             viewModel.loadSchedule(
-                FileDialog(window, "TITLE WIP", FileDialog.LOAD).apply {
+                FileDialog(window, "Load Schedule", FileDialog.LOAD).apply {
                     file = "*.schedule"
                     isVisible = true
-                }.file ?: return@launch
+                }.let {
+                    (it.directory ?: return@let null) + (it.file ?: return@let null)
+                } ?: return@launch
             )
         }
     }
@@ -129,11 +149,24 @@ fun FrameWindowScope.ScheduleMaker(
         viewModel.openSaveScheduleDialog = false
         scope.launch {
             viewModel.saveCurrentSchedule(
-                FileDialog(window, "TITLE WIP", FileDialog.SAVE).apply {
+                FileDialog(window, "Save Schedule", FileDialog.SAVE).apply {
                     file = "*.schedule"
                     isVisible = true
-                }.file ?: return@launch
+                }.let {
+                    (it.directory ?: return@let null) + (it.file ?: return@let null)
+                } ?: return@launch
             )
         }
+    }
+
+    if (viewModel.openRenameScheduleDialog) {
+        GetStringDialog(
+            title = "Rename Schedule",
+            label = "New Label",
+            onInfoEntered = {
+                viewModel.renameCurrentSchedule(it)
+                viewModel.openRenameScheduleDialog = false
+            },
+            onCancel = { viewModel.openRenameScheduleDialog = false })
     }
 }

@@ -26,6 +26,7 @@ class ViewModel(
     var openNewSubjectDialog by mutableStateOf(false)
     var openSaveSubjectsDialog by mutableStateOf(false)
     var openLoadSubjectsDialog by mutableStateOf(false)
+    var openRenameScheduleDialog by mutableStateOf(false)
     var openSaveScheduleDialog by mutableStateOf(false)
     var openLoadScheduleDialog by mutableStateOf(false)
 
@@ -36,7 +37,10 @@ class ViewModel(
     }
 
     fun computeSchedules() {
-        schedules = subjects.computeSchedules()
+        val computedSchedules = subjects.computeSchedules().filter { computedSchedule ->
+            schedules.all { it.subjects != computedSchedule.subjects }
+        }
+        schedules = schedules + computedSchedules
         currentIndex = 0
         currentSchedule = schedules.firstOrNull() ?: Schedule.EMPTY_SCHEDULE
     }
@@ -55,6 +59,17 @@ class ViewModel(
         currentSchedule = schedules[currentIndex]
     }
 
+    fun renameCurrentSchedule(newLabel: String) {
+        require(newLabel.isNotEmpty() && newLabel.isNotBlank()) { "New label cannot be empty" }
+        val newSchedule = currentSchedule.copy(label = newLabel)
+        schedules = schedules.map {
+            if (it == currentSchedule)
+                newSchedule
+            else it
+        }
+        currentSchedule = newSchedule
+    }
+
     fun loadSchedule(filename: String) {
         val newSchedule = scheduleStorage.load(filename)
         newSchedule.subjects.forEach { subject ->
@@ -62,9 +77,10 @@ class ViewModel(
                 subjects = subjects + subject
             }
         }
-        schedules = subjects.computeSchedules()
+        schedules = schedules.filter { it.subjects != newSchedule.subjects } + newSchedule
+        if (autoCompute) computeSchedules()
         val newIndex = schedules.indexOf(newSchedule)
-        check(newIndex != -1) { "Why??????" }
+        check(newIndex != -1) { "WHYY?????????" }
         currentIndex = newIndex
         currentSchedule = schedules[currentIndex]
 
@@ -77,18 +93,23 @@ class ViewModel(
     private fun deleteSchedule(schedule: Schedule) {
         schedules = schedules - schedule
         currentIndex =
-            if (currentIndex == schedules.size) 0
+            if (currentIndex == schedules.size || schedules.isEmpty()) 0
             else currentIndex
-        if (schedules.isEmpty()) schedules =
-            schedules + Schedule.EMPTY_SCHEDULE
-        currentSchedule = schedules[currentIndex]
+        currentSchedule =
+            if (schedules.isEmpty()) Schedule.EMPTY_SCHEDULE
+            else schedules[currentIndex]
     }
 
     fun deleteCurrentSchedule() = deleteSchedule(currentSchedule)
 
     fun deleteSubject(subject: Subject) {
         subjects = subjects - subject
+        schedules = schedules.filter { subject !in it.subjects }
         if (autoCompute) computeSchedules()
+        currentIndex = 0
+        currentSchedule =
+            if (schedules.isEmpty()) Schedule.EMPTY_SCHEDULE
+            else schedules[currentIndex]
     }
 
     fun addSubject(subject: Subject) {
@@ -98,7 +119,7 @@ class ViewModel(
 
     fun loadSubjects(filename: String) {
         subjects = subjectStorage.load(filename)
-        computeSchedules()
+        if (autoCompute) computeSchedules()
     }
 
     fun saveSubjects(filename: String) {
