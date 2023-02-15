@@ -15,37 +15,34 @@ fun List<Subject>.computeSchedules(): List<Schedule> {
     if (this.size == 1) return listOf(Schedule(this.first().classId.toString(), this))
     var schedules = listOf<Schedule>()
     var list = listOf<String>()
-    var smallestClass = Int.MAX_VALUE
-    var biggestClass = Int.MIN_VALUE
+    val _range = mutableListOf<Int>()
     this.forEach {
         if (!list.contains(it.name))
             list = list + it.name
-        if (it.classId < smallestClass)
-            smallestClass = it.classId
-        if (it.classId > biggestClass)
-            biggestClass = it.classId
+        if (it.classId !in _range)
+            _range.add(it.classId)
     }
-    val range = smallestClass..biggestClass
-    val valueList = list.map { range.first }.toMutableList()
+    val range = _range.toList().sorted()
+    val valueList = list.map { range.first() }.toMutableList()
     var currentIndex = list.lastIndex
     var wentBack = false
     var firstIteration = true
 
 
     while (true) {
-        if (valueList.all { it == range.last } && !firstIteration) break
-        while (valueList[currentIndex] == range.last && !firstIteration) {
+        if (valueList.all { it == range.last() } && !firstIteration) break
+        while (valueList[currentIndex] == range.last() && !firstIteration) {
             currentIndex--
             wentBack = true
         }
         if (!firstIteration)
-            valueList[currentIndex]++
+            valueList[currentIndex] = range.elementAt(range.indexOf(valueList[currentIndex]) + 1)
         else
             firstIteration = false
         if (wentBack) {
             var tempIndex = list.lastIndex
             while (tempIndex != currentIndex) {
-                valueList[tempIndex] = range.first
+                valueList[tempIndex] = range.first()
                 tempIndex--
             }
             currentIndex = list.lastIndex
