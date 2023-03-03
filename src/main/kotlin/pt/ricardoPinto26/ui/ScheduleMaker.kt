@@ -95,6 +95,15 @@ fun FrameWindowScope.ScheduleMaker(
         }
     }
 
+    val currentException = viewModel.exception
+
+    if (viewModel.openErrorDialog && currentException != null) {
+        OpenExceptionDialog(
+            exception = currentException,
+            onCancel = { viewModel.openErrorDialog = false; viewModel.exception = null }
+        )
+    }
+
     if (viewModel.openNewSubjectDialog) {
         GetNewSubject(
             onInfoEntered = { subject ->
@@ -120,28 +129,39 @@ fun FrameWindowScope.ScheduleMaker(
     if (viewModel.openLoadSubjectsDialog) {
         viewModel.openLoadSubjectsDialog = false
         scope.launch {
-            viewModel.loadSubjects(
-                FileDialog(window, "Load Subjects", FileDialog.LOAD).apply {
-                    file = "*.subjects"
-                    isVisible = true
-                }.let {
-                    (it.directory ?: return@let null) + (it.file ?: return@let null)
-                } ?: return@launch
-            )
+            try {
+                viewModel.loadSubjects(
+                    FileDialog(window, "Load Subjects", FileDialog.LOAD).apply {
+                        file = "*.subjects"
+                        isVisible = true
+                    }.let {
+                        (it.directory ?: return@let null) + (it.file ?: return@let null)
+                    } ?: return@launch
+                )
+            } catch (e: IllegalArgumentException) {
+                viewModel.openErrorDialog = true
+                viewModel.exception = IllegalArgumentException("File not formatted correctly.\nNo subjects loaded.", e)
+            }
         }
     }
 
     if (viewModel.openLoadScheduleDialog) {
         viewModel.openLoadScheduleDialog = false
         scope.launch {
-            viewModel.loadSchedule(
-                FileDialog(window, "Load Schedule", FileDialog.LOAD).apply {
-                    file = "*.schedule"
-                    isVisible = true
-                }.let {
-                    (it.directory ?: return@let null) + (it.file ?: return@let null)
-                } ?: return@launch
-            )
+            try {
+                viewModel.loadSchedule(
+                    FileDialog(window, "Load Schedule", FileDialog.LOAD).apply {
+                        file = "*.schedule"
+                        isVisible = true
+                    }.let {
+                        (it.directory ?: return@let null) + (it.file ?: return@let null)
+                    } ?: return@launch
+                )
+            } catch (e: IllegalArgumentException) {
+                viewModel.openErrorDialog = true
+                viewModel.exception =
+                    IllegalArgumentException("File not formatted correctly.\nSchedule was not loaded.", e)
+            }
         }
     }
 

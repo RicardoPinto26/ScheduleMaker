@@ -18,46 +18,50 @@ import java.io.FileNotFoundException
 object SubjectListSerializer : StringSerializer<List<Subject>> {
     override fun write(obj: List<Subject>) = obj.serialize()
     override fun parse(input: String): List<Subject> {
-        var currentSubjectName = ""
-        var currentClass = 0
-        var currentProfessor: String? = null
+        try {
+            var currentSubjectName = ""
+            var currentClass = 0
+            var currentProfessor: String? = null
 
-        var meetingTimes = listOf<MeetingTime>()
-        var currentSubjects = listOf<Subject>()
+            var meetingTimes = listOf<MeetingTime>()
+            var currentSubjects = listOf<Subject>()
 
-        var readingTimes = false
-        input.split("\r\n").forEach {
-            if (!readingTimes) {
-                val tokens = it.split(' ')
-                currentSubjectName = tokens[0]
-                currentClass = tokens[1].toInt()
-                currentProfessor = if (tokens.size == 3) tokens[2] else null
-                readingTimes = true
-            } else {
-                val times = it.split(';')
-                times.forEach { time ->
-                    val tokens = time.split('-')
-                    val day = Day.parse(tokens[0].uppercase())
-                    val startTime = tokens[1].toTime()
-                    val endTime = tokens[2].toTime()
-                    val room = if (tokens.size == 4) tokens[3] else null
-                    meetingTimes = meetingTimes + MeetingTime(
-                        day,
-                        startTime,
-                        endTime,
-                        currentSubjectName,
-                        currentProfessor,
-                        currentClass,
-                        room
-                    )
+            var readingTimes = false
+            input.split("\r\n").forEach {
+                if (!readingTimes) {
+                    val tokens = it.split(' ')
+                    currentSubjectName = tokens[0]
+                    currentClass = tokens[1].toInt()
+                    currentProfessor = if (tokens.size == 3) tokens[2] else null
+                    readingTimes = true
+                } else {
+                    val times = it.split(';')
+                    times.forEach { time ->
+                        val tokens = time.split('-')
+                        val day = Day.parse(tokens[0].uppercase())
+                        val startTime = tokens[1].toTime()
+                        val endTime = tokens[2].toTime()
+                        val room = if (tokens.size == 4) tokens[3] else null
+                        meetingTimes = meetingTimes + MeetingTime(
+                            day,
+                            startTime,
+                            endTime,
+                            currentSubjectName,
+                            currentProfessor,
+                            currentClass,
+                            room
+                        )
+                    }
+                    currentSubjects =
+                        currentSubjects + Subject(currentSubjectName, currentProfessor, currentClass, meetingTimes)
+                    meetingTimes = listOf()
+                    readingTimes = false
                 }
-                currentSubjects =
-                    currentSubjects + Subject(currentSubjectName, currentProfessor, currentClass, meetingTimes)
-                meetingTimes = listOf()
-                readingTimes = false
             }
+            return currentSubjects
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Illegal string parsed!", e)
         }
-        return currentSubjects
     }
 
 }

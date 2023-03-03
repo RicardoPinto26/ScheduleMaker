@@ -23,6 +23,9 @@ class ViewModel(
     var autoCompute = true
         private set
 
+    var openErrorDialog by mutableStateOf(false)
+    var exception by mutableStateOf<Exception?>(null)
+
     var openNewSubjectDialog by mutableStateOf(false)
     var openSaveSubjectsDialog by mutableStateOf(false)
     var openLoadSubjectsDialog by mutableStateOf(false)
