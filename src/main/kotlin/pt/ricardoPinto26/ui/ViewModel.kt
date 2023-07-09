@@ -121,7 +121,8 @@ class ViewModel(
     }
 
     fun loadSubjects(filename: String) {
-        subjects = subjectStorage.load(filename)
+        subjects += subjectStorage.load(filename)
+        subjects = subjects.toSet().toList()
         if (autoCompute) computeSchedules()
     }
 

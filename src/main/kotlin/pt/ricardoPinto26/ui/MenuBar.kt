@@ -16,13 +16,13 @@ fun FrameWindowScope.ScheduleMenu(
 ) = MenuBar {
     Menu("File") {
         Menu("Subject") {
-            Item("Add", onClick = onAddSubject)
-            Item("Load", onClick = onLoadSubjects)
+            Item("New", onClick = onAddSubject)
+            Item("Add", onClick = onLoadSubjects)
             Item("Save", onClick = onSaveSubjects)
         }
         Menu("Schedule") {
-            Item("Load [TODO]", onClick = onLoadSchedule)
-            Item("Save [wip]", onClick = onSaveSchedule)
+            Item("Load", onClick = onLoadSchedule)
+            Item("Save", onClick = onSaveSchedule)
         }
     }
     Menu("Options") {
