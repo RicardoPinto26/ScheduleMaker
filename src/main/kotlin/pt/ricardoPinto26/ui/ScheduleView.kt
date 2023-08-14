@@ -1,7 +1,11 @@
 package pt.ricardoPinto26.ui
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,19 +21,21 @@ val SEGMENT_HEIGHT = 24.dp
 val SEGMENT_WIDTH = 128.dp
 val BORDER_THICKNESS = 1.dp
 const val SEGMENT_DURATION = 30
+const val TIME_SLOTS = 31
+val STARTING_TIME = Time(8, 0)
 
 @Composable
 fun ScheduleView(schedule: Schedule) {
     Row {
         Column {
-            var time = Time(8, 0)
+            var time = STARTING_TIME
             Box(
                 Modifier.height(SEGMENT_HEIGHT).width(SEGMENT_WIDTH).border(BORDER_THICKNESS, Color.Black),
                 contentAlignment = Alignment.Center
             ) {
                 Text(schedule.label, color = Color.Red)
             }
-            repeat(30) {
+            repeat(TIME_SLOTS) {
                 val nextTime = time + 30
                 Box(
                     Modifier.height(SEGMENT_HEIGHT).width(SEGMENT_WIDTH).border(BORDER_THICKNESS, Color.Black),
@@ -40,7 +46,7 @@ fun ScheduleView(schedule: Schedule) {
                 time = nextTime
             }
         }
-        Day.values().forEach { day ->
+        Day.entries.forEach { day ->
             var minusSegments = 0
             Column {
                 var time = Time(8, 0)
@@ -50,7 +56,7 @@ fun ScheduleView(schedule: Schedule) {
                 ) {
                     Text(day.name)
                 }
-                repeat(31) {
+                repeat(TIME_SLOTS) {
                     val possibleMeetingTime = schedule.subjects.timesFor(day).firstOrNull { it.startTime == time }
                     if (possibleMeetingTime != null) {
                         MeetingTimeView(possibleMeetingTime)

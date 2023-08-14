@@ -1,5 +1,6 @@
 package pt.ricardoPinto26.model
 
+// TODO: Maybe startTime/endTime should be a Duration
 data class MeetingTime(
     val day: Day,
     val startTime: Time,

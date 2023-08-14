@@ -63,7 +63,7 @@ class ViewModel(
     }
 
     fun renameCurrentSchedule(newLabel: String) {
-        require(newLabel.isNotEmpty() && newLabel.isNotBlank()) { "New label cannot be empty" }
+        require(newLabel.isNotBlank()) { "New label cannot be empty" }
         val newSchedule = currentSchedule.copy(label = newLabel)
         schedules = schedules.map {
             if (it == currentSchedule)
@@ -83,7 +83,7 @@ class ViewModel(
         schedules = schedules.filter { it.subjects != newSchedule.subjects } + newSchedule
         if (autoCompute) computeSchedules()
         val newIndex = schedules.indexOf(newSchedule)
-        check(newIndex != -1) { "WHYY?????????" }
+        check(newIndex != -1) { "WHY?????????" }
         currentIndex = newIndex
         currentSchedule = schedules[currentIndex]
 

@@ -10,6 +10,7 @@ data class Schedule(val label: String, val subjects: List<Subject>) {
     }
 }
 
+// TODO: Understand wtf this code does
 fun List<Subject>.computeSchedules(): List<Schedule> {
     if (this.isEmpty()) return emptyList()
     if (this.size == 1) return listOf(Schedule(this.first().classId.toString(), this))

@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.FrameWindowScope
+import java.awt.FileDialog
 import kotlinx.coroutines.launch
 import pt.ricardoPinto26.model.Schedule
 import pt.ricardoPinto26.model.Subject
 import pt.ricardoPinto26.storage.Storage
-import java.awt.FileDialog
 
 @Composable
 fun FrameWindowScope.ScheduleMaker(

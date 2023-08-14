@@ -1,8 +1,8 @@
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
 
-    id("org.jetbrains.compose") version "1.2.1"
+    id("org.jetbrains.compose") version "1.4.3"
 }
 
 repositories {
@@ -15,8 +15,6 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-
-    implementation("org.litote.kmongo:kmongo-coroutine:4.8.0")
 
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
 

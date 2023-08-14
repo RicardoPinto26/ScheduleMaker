@@ -5,15 +5,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
-import pt.ricardoPinto26.model.*
+import java.io.File
+import java.io.FileNotFoundException
+import pt.ricardoPinto26.model.Day
+import pt.ricardoPinto26.model.MeetingTime
+import pt.ricardoPinto26.model.Schedule
+import pt.ricardoPinto26.model.Subject
+import pt.ricardoPinto26.model.computeSchedules
+import pt.ricardoPinto26.model.serialize
+import pt.ricardoPinto26.model.toTime
 import pt.ricardoPinto26.storage.FileStorage
 import pt.ricardoPinto26.storage.StringSerializer
 import pt.ricardoPinto26.ui.BORDER_THICKNESS
 import pt.ricardoPinto26.ui.SEGMENT_HEIGHT
 import pt.ricardoPinto26.ui.SEGMENT_WIDTH
 import pt.ricardoPinto26.ui.ScheduleMaker
-import java.io.File
-import java.io.FileNotFoundException
 
 object SubjectListSerializer : StringSerializer<List<Subject>> {
     override fun write(obj: List<Subject>) = obj.serialize()
@@ -91,8 +97,8 @@ fun main(args: Array<String>) {
         val winState =
             WindowState(
                 size = DpSize(
-                    SEGMENT_WIDTH * (Day.values().size + 1 + 4),
-                    SEGMENT_HEIGHT * 32 + BORDER_THICKNESS * 31 + 10.dp
+                    SEGMENT_WIDTH * (Day.entries.size + 1 + 4),
+                    SEGMENT_HEIGHT * 32 + BORDER_THICKNESS * 31 + 10.dp + 100.dp
                 )
             )
         Window(
