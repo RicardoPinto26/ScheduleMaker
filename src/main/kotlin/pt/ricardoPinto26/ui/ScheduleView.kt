@@ -21,7 +21,7 @@ val SEGMENT_HEIGHT = 24.dp
 val SEGMENT_WIDTH = 128.dp
 val BORDER_THICKNESS = 1.dp
 const val SEGMENT_DURATION = 30
-const val TIME_SLOTS = 31
+const val TIME_SLOTS = 30
 val STARTING_TIME = Time(8, 0)
 
 @Composable
