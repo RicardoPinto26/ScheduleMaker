@@ -10,62 +10,44 @@ data class Schedule(val label: String, val subjects: List<Subject>) {
     }
 }
 
-// TODO: Understand wtf this code does
 fun List<Subject>.computeSchedules(): List<Schedule> {
-    if (this.isEmpty()) return emptyList()
-    if (this.size == 1) return listOf(Schedule(this.first().classId.toString(), this))
-    var schedules = listOf<Schedule>()
-    var list = listOf<String>()
-    val _range = mutableListOf<Int>()
+    if(this.isEmpty()) return emptyList()
+    if(this.size == 1) return listOf(Schedule(this.first().classId.toString(), this))
+
+    var subjectsByName: List<List<Subject>> = listOf()
     this.forEach {
-        if (!list.contains(it.name))
-            list = list + it.name
-        if (it.classId !in _range)
-            _range.add(it.classId)
-    }
-    val range = _range.toList().sorted()
-    val valueList = list.map { range.first() }.toMutableList()
-    var currentIndex = list.lastIndex
-    var wentBack = false
-    var firstIteration = true
-
-
-    while (true) {
-        if (valueList.all { it == range.last() } && !firstIteration) break
-        while (valueList[currentIndex] == range.last() && !firstIteration) {
-            currentIndex--
-            wentBack = true
-        }
-        if (!firstIteration)
-            valueList[currentIndex] = range.elementAt(range.indexOf(valueList[currentIndex]) + 1)
-        else
-            firstIteration = false
-        if (wentBack) {
-            var tempIndex = list.lastIndex
-            while (tempIndex != currentIndex) {
-                valueList[tempIndex] = range.first()
-                tempIndex--
+        subjectsByName = if (subjectsByName.any { list -> list.any { sub -> sub.name == it.name } })
+            subjectsByName.map { list ->
+                if (list.any { sub -> sub.name == it.name }) list.plusElement(it)
+                else list
             }
-            currentIndex = list.lastIndex
-            wentBack = false
-        }
-        run {
-            val newSchedule = Schedule(
-                label = valueList.toString(),
-                subjects = valueList.mapIndexed { index, value ->
-                    this.firstOrNull { it.name.contains(list[index]) && it.classId == value } ?: return@run
-                }
-            )
-            if (newSchedule.subjects.all { sub1 ->
-                    newSchedule.subjects.all { sub2 ->
-                        sub1 == sub2 || sub1.isCompatible(
-                            sub2
-                        )
-                    }
-                }) {
-                schedules = schedules + newSchedule
-            }
-        }
+        else subjectsByName.plusElement(listOf(it))
+
     }
-    return schedules
+    fun cartesianProductWithCompatibilityCheck(
+        lists: List<List<Subject>>,
+        currentCombination: List<Subject> = emptyList(),
+        result: MutableList<List<Subject>> = mutableListOf()
+    ): List<List<Subject>> {
+        if (lists.isEmpty()) {
+            if (currentCombination.isCompatible()) {
+                result.add(currentCombination)
+            }
+            return result
+        }
+
+        val firstList = lists.first()
+        val remainingLists = lists.drop(1)
+
+        for (element in firstList) {
+            val newCombination = currentCombination + element
+            cartesianProductWithCompatibilityCheck(remainingLists, newCombination, result)
+        }
+
+        return result
+    }
+
+    return cartesianProductWithCompatibilityCheck(subjectsByName).map {
+        Schedule(it.joinToString { sub -> sub.classId.toString() }, it)
+    }
 }

@@ -24,6 +24,11 @@ fun List<Subject>.timesFor(day: Day): List<MeetingTime> {
     return list
 }
 
+fun List<Subject>.isCompatible(): Boolean =
+    this.all { sub ->
+        this.all { sub == it || it.isCompatible(sub) }
+    }
+
 fun List<Subject>.serialize(): String {
     var string = ""
     this.forEach { string += "$it\r\n" }

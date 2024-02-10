@@ -43,7 +43,7 @@ fun MeetingTimeView(meetingTime: MeetingTime) {
 val SUBJECT_BUTTON_HEIGHT = 34.dp
 
 @Composable
-fun SubjectListView(list: List<Subject>, onDelete: (Subject) -> Unit) {
+fun SubjectListView(list: List<Subject>, onChoose: (Subject) -> Unit) {
     Column(
         modifier = Modifier.background(Color.LightGray).border(BORDER_THICKNESS, Color.Black).width(SEGMENT_WIDTH * 2)
             .heightIn(min = SUBJECT_BUTTON_HEIGHT)
@@ -53,7 +53,7 @@ fun SubjectListView(list: List<Subject>, onDelete: (Subject) -> Unit) {
                 border = BorderStroke(BORDER_THICKNESS, Color.Black),
                 shape = RoundedCornerShape(100),
                 modifier = Modifier.padding(0.dp).height(SUBJECT_BUTTON_HEIGHT).fillMaxWidth(),
-                onClick = { onDelete(it) }) {
+                onClick = { onChoose(it) }) {
                 Text(
                     modifier = Modifier.padding(0.dp),
                     fontSize = 12.sp,

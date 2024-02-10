@@ -32,6 +32,7 @@ class ViewModel(
     var openRenameScheduleDialog by mutableStateOf(false)
     var openSaveScheduleDialog by mutableStateOf(false)
     var openLoadScheduleDialog by mutableStateOf(false)
+    var openEditSubjectDialog by mutableStateOf<Subject?>(null)
 
     private var currentIndex = 0
 
@@ -118,6 +119,11 @@ class ViewModel(
     fun addSubject(subject: Subject) {
         subjects = subjects + subject
         if (autoCompute) computeSchedules()
+    }
+
+    fun editSubject(oldSubject: Subject, newSubject: Subject) {
+        subjects = subjects.map { if (it == oldSubject) newSubject else it }
+        computeSchedules()
     }
 
     fun loadSubjects(filename: String) {

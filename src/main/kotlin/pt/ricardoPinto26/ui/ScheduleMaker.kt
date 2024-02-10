@@ -81,7 +81,7 @@ fun FrameWindowScope.ScheduleMaker(
             }
             Row {
                 SubjectListView(viewModel.subjects) {
-                    viewModel.deleteSubject(it)
+                    viewModel.openEditSubjectDialog = it
                 }
                 Button(
                     {
@@ -188,5 +188,16 @@ fun FrameWindowScope.ScheduleMaker(
                 viewModel.openRenameScheduleDialog = false
             },
             onCancel = { viewModel.openRenameScheduleDialog = false })
+    }
+    if (viewModel.openEditSubjectDialog != null) {
+        EditSubjectDialog(
+            subject = viewModel.openEditSubjectDialog!!,
+            onInfoEntered = { subject ->
+                if(subject == null) viewModel.deleteSubject(viewModel.openEditSubjectDialog!!)
+                else viewModel.editSubject(viewModel.openEditSubjectDialog!!, subject)
+                viewModel.openEditSubjectDialog = null
+            },
+            onCancel = { viewModel.openEditSubjectDialog = null }
+        )
     }
 }
